@@ -21,9 +21,13 @@ A completely free AI-powered task management system for developers. Break down c
 
 ## 📦 Installation
 
+> ⚠️ **IMPORTANT**: Make sure to follow these steps exactly to avoid file not found errors!
+
 ```bash
 # Clone the repository
 git clone https://github.com/MR-MK47/free-taskmaster.git
+
+# Navigate into the project directory (IMPORTANT!)
 cd free-taskmaster
 
 # Install dependencies
@@ -33,6 +37,15 @@ npm install
 npm run setup
 # Or manually configure your .env file
 ```
+
+Verify your installation by running:
+
+```bash
+# Test if your model configuration works
+npm run test-model
+```
+
+If you encounter any issues with file paths or "module not found" errors, please refer to our [Installation Guide](docs/INSTALLATION.md) for detailed troubleshooting.
 
 ## ⚙️ Configuration
 
@@ -117,6 +130,7 @@ npm run expand -- --id=3 --research
 - **Custom PRDs**: Write your requirements in plain text (see `scripts/example_prd.txt`)
 - **Free Tier Limits**: Keep `MAX_TOKENS=500` in your `.env` to stay within free tier
 - **Complete Command Reference**: See [README-task-master.md](README-task-master.md) for the full command reference
+- **Installation Troubleshooting**: See [Installation Guide](docs/INSTALLATION.md) for common issues and solutions
 
 ## 👥 Contributing
 

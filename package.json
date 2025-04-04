@@ -15,7 +15,8 @@
     "set-status": "node scripts/dev.js set-status",
     "parse-prd": "node scripts/dev.js parse-prd",
     "analyze-complexity": "node scripts/dev.js analyze-complexity",
-    "test-model": "node --no-warnings scripts/modules/test-model.js"
+    "test-model": "node --no-warnings scripts/modules/test-model.js",
+    "fix": "node fix-install.js"
   },
   "bin": {
     "task-master": "./bin/task-master.js"
