@@ -1,6 +1,65 @@
-# Using DeepSeek V3 with Task Master
+# GitHub DeepSeek Setup Guide
 
-Task Master now uses the DeepSeek V3 model through Azure AI Inference as its primary LLM provider. This guide explains how to set up and use the model.
+This guide will help you set up GitHub DeepSeek integration for Free Task Master. The GitHub DeepSeek option uses the GitHub API to access DeepSeek models completely for free.
+
+## Step 1: Create a GitHub Personal Access Token
+
+1. Go to your GitHub account settings at https://github.com/settings/tokens
+2. Click "Generate new token" > "Generate new token (classic)"
+3. Give your token a name (e.g., "Task Master DeepSeek")
+4. Select the `models:read` scope (under "AI features")
+5. Click "Generate token"
+6. **Important**: Copy your token immediately as you won't be able to see it again
+
+## Step 2: Configure Your Environment
+
+1. Open your `.env` file in the Task Master project
+2. Add your GitHub token:
+   ```
+   GITHUB_TOKEN=your_github_token_here
+   ```
+3. Make sure DeepSeek is set as the default provider:
+   ```
+   USE_PERPLEXITY=false
+   ```
+4. Configure the DeepSeek model (the defaults should work):
+   ```
+   DEEPSEEK_ENDPOINT=https://models.inference.ai.azure.com
+   DEEPSEEK_MODEL=DeepSeek-V3
+   ```
+
+## Step 3: Verify Your Setup
+
+Run the test-model script to verify your setup is working correctly:
+
+```bash
+npm run test-model
+```
+
+You should see output indicating that the DeepSeek model is being used and a response to the test prompt.
+
+## Troubleshooting
+
+If you encounter any issues:
+
+1. **Token Permissions**: Make sure your GitHub token has the `models:read` scope
+2. **Token Validation**: Ensure your token is correctly copied without any extra spaces
+3. **Debug Mode**: Set `DEBUG=true` in your `.env` file for more detailed logs
+4. **Model Endpoint**: If you get endpoint errors, check if the default endpoint is still current
+
+## Usage Notes
+
+- The DeepSeek integration works well for code-focused tasks
+- For research-intensive tasks, consider using the `--research` flag to temporarily use Perplexity
+- Token limits are handled automatically to stay within free tier limits
+
+## Advanced Configuration
+
+If you need to customize the DeepSeek integration further, you can modify:
+
+- `DEEPSEEK_MODEL`: DeepSeek model version to use (default: "DeepSeek-V3")
+- `MAX_TOKENS`: Token generation limit (default: 500)
+- `TEMPERATURE`: Creativity setting (default: 0.7)
 
 ## Prerequisites
 

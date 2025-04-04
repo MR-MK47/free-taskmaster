@@ -1,0 +1,29 @@
+# Development files
+.git/
+.github/
+.cursor/
+.vscode/
+.idea/
+.DS_Store
+.windsurfrules
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Large directories
+node_modules/
+.next/
+todo-app/
+
+# Project-specific
+tasks/tasks.json
+scripts/task-complexity-report.json
+scripts/PRD.txt
+
+# User-specific files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log* 

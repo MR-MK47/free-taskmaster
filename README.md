@@ -1,110 +1,130 @@
-# Task Master AI
+# Free Task Master
 
-A task management system powered by AI. This system helps developers break down complex projects into manageable tasks, track progress, and maintain documentation—all with the assistance of AI.
+A completely free AI-powered task management system for developers. Break down complex projects into manageable tasks, track progress, and maintain documentation—all without spending a dime on API costs.
 
-## Features
+## 🚀 Features
 
-- **AI-Powered Task Generation**: Convert project requirements into structured tasks
+- **100% Free**: Uses free tier AI models with no credit card required
+- **Multi-Model Support**: Choice of GitHub DeepSeek or Perplexity via OpenRouter
+- **AI-Powered Task Generation**: Convert requirements into structured tasks
 - **Dependency Management**: Track relationships between tasks
-- **Task Expansion**: Break down complex tasks into smaller subtasks
-- **Progress Tracking**: Monitor project completion status
-- **Multi-Model Support**: Uses GitHub DeepSeek or Perplexity via OpenRouter
-- **Command-Line Interface**: Simple, intuitive commands for task management
+- **Task Expansion**: Break down complex tasks into manageable subtasks
+- **Complexity Analysis**: Identify which tasks need further breakdown
+- **Research-Backed Generation**: Use Perplexity's capabilities for research-intensive tasks
 
-## Requirements
+## 🔑 Requirements
 
 - Node.js v14+
-- GitHub API key for DeepSeek integration OR OpenRouter API key for Perplexity
-- Free or paid API access options available
+- One of the following free accounts:
+  - GitHub account (for DeepSeek integration)
+  - OpenRouter account (for Perplexity integration)
 
-## Installation
+## 📦 Installation
 
 ```bash
-git clone https://github.com/yourusername/task-master.git
-cd task-master
+# Clone the repository
+git clone https://github.com/MR-MK47/free-taskmaster.git
+cd free-taskmaster
+
+# Install dependencies
 npm install
+
+# Set up configuration
 cp .env.example .env
 # Edit .env with your API keys
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-Required environment variables (in `.env`):
-- For DeepSeek: `GITHUB_TOKEN`: Your GitHub personal access token
-- For Perplexity: `OPENROUTER_API_KEY`: Your OpenRouter API key
-- Model Selection: `USE_PERPLEXITY`: Set to "true" for Perplexity, "false" for DeepSeek
+Configure your `.env` file with one of these free options:
 
-Optional environment variables:
-- `DEEPSEEK_ENDPOINT`: Azure AI Inference endpoint (default: "https://models.inference.ai.azure.com")
-- `DEEPSEEK_MODEL`: DeepSeek model name (default: "DeepSeek-V3")
-- `PERPLEXITY_MODEL`: Perplexity model via OpenRouter (default: "perplexity/sonar")
-- `MAX_TOKENS`: Maximum tokens for model responses (default: "2000")
-- `TEMPERATURE`: Temperature for model responses (default: "0.7")
-- `DEBUG`: Set to "true" to enable debug logging (default: "false")
+### Option 1: GitHub DeepSeek (Default)
+1. Create a GitHub Personal Access Token with `models:read` permission
+2. Add to your `.env`:
+   ```
+   GITHUB_TOKEN=your_github_token
+   USE_PERPLEXITY=false
+   ```
 
-## Usage
+### Option 2: Perplexity via OpenRouter
+1. Sign up for free OpenRouter account
+2. Get your API key from openrouter.ai
+3. Add to your `.env`:
+   ```
+   OPENROUTER_API_KEY=your_openrouter_key
+   USE_PERPLEXITY=true
+   ```
 
-### Basic Commands
+## 🛠️ Usage
+
+### Initializing a Project
 
 ```bash
-# Initialize and parse requirements
-node scripts/dev.js parse-prd --input=requirements.txt
+# Parse a requirements document to generate tasks
+npm run parse-prd -- scripts/example_prd.txt
 
+# Or use your own PRD file
+npm run parse-prd -- path/to/your/requirements.txt
+```
+
+### Managing Tasks
+
+```bash
 # List all tasks
-node scripts/dev.js list
+npm run list
 
-# View details of a specific task
-node scripts/dev.js show --id=3
+# See which task to work on next
+npm run next
+
+# Show details of a specific task
+npm run show -- --id=3
 
 # Mark a task as complete
-node scripts/dev.js set-status --id=3 --status=done
+npm run set-status -- --id=3 --status=done
 
 # Expand a task into subtasks
-node scripts/dev.js expand --id=3 --subtasks=5
+npm run expand -- --id=3
+
+# Use Perplexity for research-backed expansion (regardless of default model)
+npm run expand -- --id=3 --research
 ```
 
 ### Advanced Features
 
 ```bash
 # Analyze task complexity
-node scripts/dev.js analyze-complexity
+npm run analyze-complexity
 
-# Add research capabilities to task generation
-node scripts/dev.js expand --id=3 --research
-
-# Generate documentation
-node scripts/dev.js generate-docs
-
-# Update task dependencies
-node scripts/dev.js update --from=5 --prompt="Using MongoDB instead of PostgreSQL"
+# Test your model configuration
+npm run test-model
 ```
 
-## Model Options
+## 🔄 Switching Between Models
 
-### DeepSeek (Default)
-- Excellent for code generation and technical tasks
-- Uses GitHub authentication and Azure AI Inference
-- See [DeepSeek Integration Guide](docs/github-deepseek-setup.md)
+You can easily switch between free models:
 
-### Perplexity via OpenRouter
-- Strong research capabilities and factual accuracy
-- Free tier available through OpenRouter
-- Used for both standard task processing (when `USE_PERPLEXITY=true`) and the `--research` flag
-- See [Perplexity Integration Guide](docs/perplexity-setup.md)
+1. **DeepSeek**: Set `USE_PERPLEXITY=false` in `.env` (default)
+2. **Perplexity**: Set `USE_PERPLEXITY=true` in `.env`
 
-## Documentation
+Or use Perplexity temporarily with the `--research` flag for any command:
+```bash
+npm run expand -- --id=3 --research
+```
 
-For more detailed information, see the following documentation:
+## 📚 Documentation
 
-- [DeepSeek Integration Guide](docs/github-deepseek-setup.md)
-- [Perplexity Integration Guide](docs/perplexity-setup.md)
-- [Task Management Commands](docs/commands.md)
-- [Customizing Task Templates](docs/templates.md)
+- **Task Structure**: Tasks are saved in `tasks/tasks.json` and individual task files
+- **Custom PRDs**: Write your requirements in plain text (see `scripts/example_prd.txt`)
+- **Free Tier Limits**: Keep `MAX_TOKENS=500` in your `.env` to stay within free tier
 
-## Contributing
+## 👥 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Feel free to submit issues or pull requests.
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+**Note**: This is a community-maintained free version of the original Task Master AI project, focused on making AI-powered development workflows accessible to everyone at no cost.

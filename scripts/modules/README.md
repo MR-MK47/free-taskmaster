@@ -1,49 +1,62 @@
 # Task Master Modules
 
-This directory contains modular components for the Task Master system. These components separate concerns and improve maintainability.
+This directory contains modular components for the free Task Master system that enable using entirely free AI models.
 
 ## Overview of Components
 
 - `commands.js`: Main CLI command routing and coordination
-- `llm-client.js`: LLM provider adapters for multi-model support
+- `llm-client.js`: LLM provider adapters for free model options
+- `test-model.js`: Utility script to test your model configuration
 
-## LLM Adapter System
+## Free LLM Adapter System
 
-The LLM adapter system provides a unified interface to work with multiple language model providers:
+The LLM adapter system provides a unified interface to work with multiple free language model providers:
 
-1. **Anthropic Claude**: Default provider, provides powerful reasoning capabilities
-2. **GitHub DeepSeek**: Alternative provider available through GitHub's Marketplace API
+1. **GitHub DeepSeek**: Uses the GitHub token authentication to access free DeepSeek AI models
+2. **Perplexity via OpenRouter**: Uses the free tier of OpenRouter to access Perplexity models
 
-### How to Use Different Providers
+### How to Use Different Free Providers
 
-Configure your `.env` file to select which provider to use:
+Configure your `.env` file to select which free provider to use:
 
 ```
-# Use Claude (default)
-USE_DEEPSEEK=false
-ANTHROPIC_API_KEY=your-api-key-here
+# Use GitHub DeepSeek (default)
+USE_PERPLEXITY=false
+GITHUB_TOKEN=your-github-token-here
 
-# Or use GitHub DeepSeek
-USE_DEEPSEEK=true
-GITHUB_API_KEY=your-github-api-key-here
-DEEPSEEK_MODEL=azureml-deepseek/DeepSeek-V3
+# Or use Perplexity via OpenRouter
+USE_PERPLEXITY=true
+OPENROUTER_API_KEY=your-openrouter-api-key-here
+PERPLEXITY_MODEL=perplexity/sonar
 ```
 
-The system will automatically switch between providers based on the `USE_DEEPSEEK` flag.
+The system will automatically switch between providers based on the `USE_PERPLEXITY` flag.
 
 ### Adapter Interface
 
-Each adapter must implement the following interface:
+Each adapter implements a consistent interface:
 
-- `type`: Provider type identifier
-- `model`: Currently selected model identifier
-- `generateText(prompt, options)`: Method to generate text based on a prompt
+- `name`: Provider name identifier
+- `modelName`: Currently selected model identifier
+- `generateText(prompt, options)`: Generate text based on a prompt
+- `generateTasks(prdContent)`: Generate tasks from PRD content
+- `analyzeComplexity(task)`: Analyze task complexity and provide recommendations
 
-### Adding New Providers
+### Adding New Free Providers
 
-To add a new provider:
+To add a new free provider:
 
-1. Create a new adapter function in `llm-client.js`
-2. Add the provider type to `PROVIDER_TYPES`
+1. Create a new adapter class in `llm-client.js`
+2. Implement all required interface methods
 3. Update the provider selection logic in `createLLMClient()`
-4. Update the `.env` file with appropriate configuration settings 
+4. Update the `.env.example` file with appropriate configuration settings
+
+### Research Mode
+
+For tasks requiring research capabilities, you can use the `--research` flag with commands:
+
+```bash
+npm run expand -- --id=3 --research
+```
+
+This temporarily uses Perplexity (which has strong research capabilities) even if your default is set to DeepSeek. 

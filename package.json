@@ -1,15 +1,36 @@
 {
-  "name": "coders-point",
+  "name": "free-task-master",
   "version": "1.0.0",
-  "description": "Task management system using DeepSeek AI",
-  "author": "CODE SEEKERS",
+  "description": "Free AI-powered task management system using DeepSeek or Perplexity",
+  "author": "Task Master Community",
+  "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/dev.js",
+    "setup": "node setup.js",
+    "start": "node scripts/dev.js",
     "list": "node scripts/dev.js list",
-    "generate": "node scripts/dev.js generate",
+    "next": "node scripts/dev.js next",
+    "show": "node scripts/dev.js show",
+    "expand": "node scripts/dev.js expand",
+    "set-status": "node scripts/dev.js set-status",
     "parse-prd": "node scripts/dev.js parse-prd",
+    "analyze-complexity": "node scripts/dev.js analyze-complexity",
     "test-model": "node --no-warnings scripts/modules/test-model.js"
+  },
+  "bin": {
+    "task-master": "./bin/task-master.js"
+  },
+  "keywords": [
+    "ai",
+    "task-management",
+    "project-planning",
+    "deepseek",
+    "perplexity",
+    "free"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MR-MK47/free-taskmaster.git"
   },
   "dependencies": {
     "@azure-rest/ai-inference": "^1.0.0-beta.6",
@@ -25,5 +46,8 @@
     "gradient-string": "^2.0.2",
     "openai": "^4.28.0",
     "ora": "^7.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

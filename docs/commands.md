@@ -1,200 +1,164 @@
-# Task Master Commands Reference
+# Free Task Master Commands
 
-This document provides a comprehensive reference of all available commands in Task Master.
+This document outlines all available commands in the Free Task Master system.
 
 ## Basic Commands
 
-### Parse PRD
-
-```bash
-# Parse a PRD file and generate tasks
-task-master parse-prd <prd-file.txt>
-
-# Limit the number of tasks generated
-task-master parse-prd <prd-file.txt> --num-tasks=10
-```
-
 ### List Tasks
 
+List all tasks with their status:
+
 ```bash
-# List all tasks
-task-master list
-
-# List tasks with a specific status
-task-master list --status=<status>
-
-# List tasks with subtasks
-task-master list --with-subtasks
-
-# List tasks with a specific status and include subtasks
-task-master list --status=<status> --with-subtasks
+npm run list
+# or with options
+node scripts/dev.js list --with-subtasks
 ```
 
-### Show Next Task
+Options:
+- `--status=<status>`: Filter by status (e.g., "pending", "done", "deferred")
+- `--with-subtasks`: Show subtasks under each main task
+- `--file=<path>`: Use an alternative tasks.json file
+
+### Show Task Details
+
+Display detailed information about a specific task:
 
 ```bash
-# Show the next task to work on based on dependencies and status
-task-master next
+npm run show -- --id=1
+# or directly
+node scripts/dev.js show 1
 ```
 
-### Show Specific Task
+Options:
+- `--id=<id>`: ID of the task to show (can also be specified as the first argument)
+- `--file=<path>`: Use an alternative tasks.json file
+
+Note: You can view subtasks using dot notation (e.g., `show 1.2` for subtask 2 of task 1)
+
+### Find Next Task
+
+Show the next task to work on based on dependencies and priority:
 
 ```bash
-# Show details of a specific task
-task-master show <id>
+npm run next
 # or
-task-master show --id=<id>
-
-# View a specific subtask (e.g., subtask 2 of task 1)
-task-master show 1.2
+node scripts/dev.js next
 ```
 
-### Update Tasks
+Options:
+- `--file=<path>`: Use an alternative tasks.json file
+
+### Update Task Status
+
+Change the status of a task:
 
 ```bash
-# Update tasks from a specific ID and provide context
-task-master update --from=<id> --prompt="<prompt>"
+npm run set-status -- --id=1 --status=done
+# or
+node scripts/dev.js set-status --id=1 --status=done
 ```
 
-### Generate Task Files
+Options:
+- `--id=<id>`: ID of the task to update (required)
+- `--status=<status>`: New status value (required)
+- `--file=<path>`: Use an alternative tasks.json file
+
+Valid status values: "done", "pending", "deferred"
+
+## Task Generation
+
+### Parse PRD
+
+Generate tasks from a Product Requirements Document:
 
 ```bash
-# Generate individual task files from tasks.json
-task-master generate
+npm run parse-prd -- path/to/requirements.txt
+# or
+node scripts/dev.js parse-prd path/to/requirements.txt
 ```
 
-### Set Task Status
+This will:
+1. Read the specified PRD file
+2. Process it using the configured LLM
+3. Generate a structured set of tasks in `tasks/tasks.json`
+4. Create individual task files in the `tasks/` directory
+
+### Expand Task
+
+Break down a task into subtasks:
 
 ```bash
-# Set status of a single task
-task-master set-status --id=<id> --status=<status>
-
-# Set status for multiple tasks
-task-master set-status --id=1,2,3 --status=<status>
-
-# Set status for subtasks
-task-master set-status --id=1.1,1.2 --status=<status>
+npm run expand -- --id=3
+# or with options
+node scripts/dev.js expand --id=3 --research
 ```
 
-When marking a task as "done", all of its subtasks will automatically be marked as "done" as well.
+Options:
+- `--id=<id>`: ID of the task to expand (required unless using --all)
+- `--all`: Expand all pending tasks without subtasks
+- `--num=<number>`: Number of subtasks to generate
+- `--research`: Use Perplexity for research-backed generation
+- `--prompt=<text>`: Additional context for subtask generation
+- `--force`: Regenerate subtasks even if they already exist
 
-## Task Expansion and Management
+## Analysis & Research
 
-### Expand Tasks
+### Analyze Complexity
+
+Analyze task complexity and provide recommendations:
 
 ```bash
-# Expand a specific task with subtasks
-task-master expand --id=<id> --num=<number>
-
-# Expand with additional context
-task-master expand --id=<id> --prompt="<context>"
-
-# Expand all pending tasks
-task-master expand --all
-
-# Force regeneration of subtasks for tasks that already have them
-task-master expand --all --force
-
-# Research-backed subtask generation for a specific task (via OpenRouter)
-task-master expand --id=<id> --research
-
-# Research-backed generation for all tasks (via OpenRouter)
-task-master expand --all --research
+npm run analyze-complexity
+# or with options
+node scripts/dev.js analyze-complexity --research
 ```
 
-### Clear Subtasks
+Options:
+- `--output=<file>`: Output file path
+- `--threshold=<number>`: Minimum score for expansion recommendation
+- `--research`: Use Perplexity for research-backed analysis
+- `--file=<path>`: Use an alternative tasks.json file
+
+### Test Model
+
+Verify your model configuration is working:
 
 ```bash
-# Clear subtasks from a specific task
-task-master clear-subtasks --id=<id>
-
-# Clear subtasks from multiple tasks
-task-master clear-subtasks --id=1,2,3
-
-# Clear subtasks from all tasks
-task-master clear-subtasks --all
+npm run test-model
 ```
 
-## Analysis and Optimization
+This sends a simple test prompt to your configured LLM provider and displays the response time and content.
 
-### Analyze Task Complexity
+## Best Practices
+
+1. **Start with parsing a PRD**: Begin by creating a requirements document and parsing it to generate initial tasks
+2. **Check the next task regularly**: Use `npm run next` to always know what to work on
+3. **Break down complex tasks**: Use `npm run expand -- --id=<id>` to make tasks more manageable
+4. **Use research mode for complex tasks**: Add `--research` to leverage Perplexity's capabilities
+5. **Mark tasks as done progressively**: Keep your task list up to date as you complete work
+6. **Keep token limits low**: Configure `MAX_TOKENS=500` to stay within free tier limits
+
+## Example Workflow
 
 ```bash
-# Analyze complexity of all tasks
-task-master analyze-complexity
+# Generate tasks from requirements
+npm run parse-prd -- scripts/example_prd.txt
 
-# Save report to a custom location
-task-master analyze-complexity --output=my-report.json
+# List all tasks
+npm run list
 
-# Use a specific LLM model
-task-master analyze-complexity --model=claude-3-opus-20240229
+# Find the next task to work on
+npm run next
 
-# Set a custom complexity threshold (1-10)
-task-master analyze-complexity --threshold=6
+# Break down the task if needed
+npm run expand -- --id=1 --research
 
-# Use an alternative tasks file
-task-master analyze-complexity --file=custom-tasks.json
+# Show detailed information
+npm run show -- --id=1
 
-# Use OpenRouter Perplexity for research-backed complexity analysis
-task-master analyze-complexity --research
-```
+# Mark as done when complete
+npm run set-status -- --id=1 --status=done
 
-### View Complexity Report
-
-```bash
-# Display the task complexity analysis report
-task-master complexity-report
-
-# View a report at a custom location
-task-master complexity-report --file=my-report.json
-```
-
-### Managing Task Dependencies
-
-```bash
-# Add a dependency to a task
-task-master add-dependency --id=<id> --depends-on=<id>
-
-# Remove a dependency from a task
-task-master remove-dependency --id=<id> --depends-on=<id>
-
-# Validate dependencies without fixing them
-task-master validate-dependencies
-
-# Find and fix invalid dependencies automatically
-task-master fix-dependencies
-```
-
-### Add a New Task
-
-```bash
-# Add a new task using AI
-task-master add-task --prompt="Description of the new task"
-
-# Add a task with dependencies
-task-master add-task --prompt="Description" --dependencies=1,2,3
-
-# Add a task with priority
-task-master add-task --prompt="Description" --priority=high
-```
-
-## Using the Research Flag
-
-The `--research` flag enhances certain commands with additional context-gathering capabilities through the Perplexity model via OpenRouter:
-
-1. **How it works**: When you use the `--research` flag, Task Master temporarily switches to using the Perplexity model (if not already using it) to provide enhanced research-backed responses.
-
-2. **Setting up**: To use this feature, make sure your `.env` file has a valid `OPENROUTER_API_KEY`.
-
-3. **Command Usage**:
-   ```bash
-   # Research-enhanced task expansion
-   task-master expand --id=3 --research
-   
-   # Research-enhanced complexity analysis
-   task-master analyze-complexity --research
-   ```
-
-4. **Temporary Mode**: The system will temporarily switch to Perplexity mode if you normally use DeepSeek, and then switch back afterward.
-
-5. **Benefits**: More contextually relevant subtasks and more accurate complexity analysis when dealing with tasks that require domain knowledge or current information. 
+# Find the next task again
+npm run next
+``` 

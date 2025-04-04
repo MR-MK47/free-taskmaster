@@ -33,13 +33,32 @@ export function createLLMClient() {
   }
   
   if (usePerplexity) {
-    const openrouterApiKey = process.env.OPENROUTER_API_KEY;
-    if (!openrouterApiKey) {
-      throw new Error('OPENROUTER_API_KEY is required for Perplexity integration');
+    try {
+      const openrouterApiKey = process.env.OPENROUTER_API_KEY;
+      if (!openrouterApiKey) {
+        throw new Error('OPENROUTER_API_KEY is required for Perplexity integration');
+      }
+      
+      const model = process.env.PERPLEXITY_MODEL || 'perplexity/sonar';
+      console.log('Using Perplexity via OpenRouter...');
+      return createPerplexityAdapter(openrouterApiKey, model);
+    } catch (error) {
+      console.warn('Failed to initialize Perplexity client:', error.message);
+      console.log('Falling back to DeepSeek...');
+      
+      // Fall back to DeepSeek
+      const githubToken = process.env.GITHUB_TOKEN;
+      if (!githubToken) {
+        throw new Error('Neither Perplexity nor DeepSeek could be initialized. GITHUB_TOKEN is missing for fallback.');
+      }
+      
+      const endpoint = process.env.DEEPSEEK_ENDPOINT || 'https://models.inference.ai.azure.com';
+      const modelName = process.env.DEEPSEEK_MODEL || 'DeepSeek-V3';
+      
+      // Create Azure AI Inference client
+      const client = ModelClient(endpoint, new AzureKeyCredential(githubToken));
+      return createGitHubDeepSeekAdapter(client, modelName);
     }
-    
-    const model = process.env.PERPLEXITY_MODEL || 'perplexity/sonar-pro';
-    return createPerplexityAdapter(openrouterApiKey, model);
   } else {
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
@@ -150,6 +169,91 @@ function createPerplexityAdapter(apiKey, model) {
         
         throw new Error(errorMessage);
       }
+    },
+
+    /**
+     * Generate tasks from PRD content
+     * @param {string} prdContent - The PRD content to parse
+     * @returns {Promise<Object>} Generated tasks
+     */
+    async generateTasks(prdContent) {
+      const prompt = `Please analyze this PRD and break it down into a structured set of development tasks. 
+Return ONLY a JSON object (no markdown, no code blocks) with an array of tasks. Each task should have:
+- id: A unique numeric identifier
+- title: A clear, concise title
+- description: Detailed implementation notes
+- priority: high/medium/low
+- status: "pending"
+- dependencies: Array of task IDs this task depends on (can be empty)
+- subtasks: Empty array (will be populated later)
+
+Here's the PRD:
+
+${prdContent}`;
+
+      const response = await this.generateText(prompt, {
+        temperature: 0.7,
+        maxTokens: 2000
+      });
+
+      try {
+        // Clean the response by removing markdown code block markers if present
+        const cleanedResponse = response.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        return JSON.parse(cleanedResponse);
+      } catch (error) {
+        console.error('Raw response:', response);
+        throw new Error('Failed to parse LLM response as JSON. Response: ' + response);
+      }
+    },
+
+    /**
+     * Analyze task complexity
+     * @param {Object} task - The task to analyze
+     * @returns {Promise<Object>} Complexity analysis
+     */
+    async analyzeComplexity(task) {
+      const prompt = `Analyze the complexity of this development task and provide a structured assessment.
+Task: ${JSON.stringify(task)}
+
+Return ONLY a JSON object (no markdown formatting, no additional text) with the following structure:
+{
+  "score": number (1-10),
+  "reasoning": string (brief explanation),
+  "recommendedSubtasks": number (based on complexity),
+  "expansionPrompt": string (tailored prompt for breaking down this task)
+}`;
+
+      const response = await this.generateText(prompt, {
+        temperature: 0.7,
+        maxTokens: 1000
+      });
+
+      try {
+        // Extract JSON from the response
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('No JSON object found in response');
+        }
+        
+        const cleanedResponse = jsonMatch[0]
+          .replace(/^```json\s*/, '')  // Remove opening code block
+          .replace(/\s*```$/, '')      // Remove closing code block
+          .trim();
+        
+        const result = JSON.parse(cleanedResponse);
+        
+        // Validate the response structure
+        if (!result.score || !result.reasoning || !result.recommendedSubtasks || !result.expansionPrompt) {
+          throw new Error('Invalid response structure: missing required fields');
+        }
+        
+        return result;
+      } catch (error) {
+        if (process.env.DEBUG?.toLowerCase() === 'true') {
+          console.error('Raw response:', response);
+        }
+        throw new Error(`Failed to parse complexity analysis response: ${error.message}`);
+      }
     }
   };
 }
@@ -195,6 +299,91 @@ function createGitHubDeepSeekAdapter(client, modelName) {
       } catch (error) {
         console.error('Error generating text with DeepSeek:', error.message);
         throw new Error(`DeepSeek API error: ${error.message}`);
+      }
+    },
+
+    /**
+     * Generate tasks from PRD content
+     * @param {string} prdContent - The PRD content to parse
+     * @returns {Promise<Object>} Generated tasks
+     */
+    async generateTasks(prdContent) {
+      const prompt = `Please analyze this PRD and break it down into a structured set of development tasks. 
+Return ONLY a JSON object (no markdown, no code blocks) with an array of tasks. Each task should have:
+- id: A unique numeric identifier
+- title: A clear, concise title
+- description: Detailed implementation notes
+- priority: high/medium/low
+- status: "pending"
+- dependencies: Array of task IDs this task depends on (can be empty)
+- subtasks: Empty array (will be populated later)
+
+Here's the PRD:
+
+${prdContent}`;
+
+      const response = await this.generateText(prompt, {
+        temperature: 0.7,
+        maxTokens: 4000
+      });
+
+      try {
+        // Clean the response by removing markdown code block markers if present
+        const cleanedResponse = response.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        return JSON.parse(cleanedResponse);
+      } catch (error) {
+        console.error('Raw response:', response);
+        throw new Error('Failed to parse LLM response as JSON. Response: ' + response);
+      }
+    },
+
+    /**
+     * Analyze task complexity
+     * @param {Object} task - The task to analyze
+     * @returns {Promise<Object>} Complexity analysis
+     */
+    async analyzeComplexity(task) {
+      const prompt = `Analyze the complexity of this development task and provide a structured assessment.
+Task: ${JSON.stringify(task)}
+
+Return ONLY a JSON object (no markdown formatting, no additional text) with the following structure:
+{
+  "score": number (1-10),
+  "reasoning": string (brief explanation),
+  "recommendedSubtasks": number (based on complexity),
+  "expansionPrompt": string (tailored prompt for breaking down this task)
+}`;
+
+      const response = await this.generateText(prompt, {
+        temperature: 0.7,
+        maxTokens: 1000
+      });
+
+      try {
+        // Extract JSON from the response
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('No JSON object found in response');
+        }
+        
+        const cleanedResponse = jsonMatch[0]
+          .replace(/^```json\s*/, '')  // Remove opening code block
+          .replace(/\s*```$/, '')      // Remove closing code block
+          .trim();
+        
+        const result = JSON.parse(cleanedResponse);
+        
+        // Validate the response structure
+        if (!result.score || !result.reasoning || !result.recommendedSubtasks || !result.expansionPrompt) {
+          throw new Error('Invalid response structure: missing required fields');
+        }
+        
+        return result;
+      } catch (error) {
+        if (process.env.DEBUG?.toLowerCase() === 'true') {
+          console.error('Raw response:', response);
+        }
+        throw new Error(`Failed to parse complexity analysis response: ${error.message}`);
       }
     }
   };

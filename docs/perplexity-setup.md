@@ -1,69 +1,79 @@
-# Using Perplexity with Task Master
+# Perplexity Setup Guide
 
-Task Master supports using Perplexity models via OpenRouter as an alternative to GitHub DeepSeek. This guide explains how to set up and use Perplexity models.
+This guide will help you set up Perplexity integration for Free Task Master using OpenRouter's free tier. Perplexity offers strong research capabilities and factual accuracy.
 
-## Prerequisites
+## Step 1: Create an OpenRouter Account
 
-1. An OpenRouter account
-2. An OpenRouter API key with access to Perplexity models
-3. Basic understanding of API usage
+1. Go to https://openrouter.ai and sign up for a free account
+2. After signing up, navigate to the API Keys section
+3. Create a new API key with a name like "Task Master"
+4. Copy your API key for the next step
 
-## Setup Instructions
+## Step 2: Configure Your Environment
 
-### 1. Get an OpenRouter API Key
+1. Open your `.env` file in the Task Master project
+2. Add your OpenRouter API key:
+   ```
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   ```
+3. Enable Perplexity as the default provider:
+   ```
+   USE_PERPLEXITY=true
+   ```
+4. Configure the Perplexity model:
+   ```
+   PERPLEXITY_MODEL=perplexity/sonar
+   ```
+5. (Optional) Set OpenRouter attribution:
+   ```
+   SITE_URL=https://your-website.com
+   SITE_NAME=Your Project Name
+   ```
 
-1. Go to [OpenRouter.ai](https://openrouter.ai) and create an account
-2. Navigate to your API Keys section
-3. Create a new API key and save it securely
+## Step 3: Verify Your Setup
 
-### 2. Configure Task Master
-
-Update your `.env` file with OpenRouter and Perplexity specific settings:
-
-```
-# Authentication
-OPENROUTER_API_KEY=your-openrouter-api-key-here
-
-# LLM Provider Configuration
-USE_PERPLEXITY=true  # Set to 'true' to use Perplexity instead of DeepSeek
-
-# Perplexity Configuration
-PERPLEXITY_MODEL=perplexity/sonar  # Model name for Perplexity
-SITE_URL=https://your-site-url.com  # For OpenRouter attribution
-SITE_NAME=Your Site Name  # For OpenRouter attribution
-
-# Common Model Configuration
-MAX_TOKENS=2000  # Maximum tokens for model responses (reduced for free tier)
-TEMPERATURE=0.7  # Temperature for model responses (0.0-1.0)
-
-# App Configuration
-DEBUG=true  # Set to true for debugging, false for production
-```
-
-### 3. Install Required Dependencies
-
-The Perplexity integration uses the OpenAI SDK to communicate with OpenRouter. Make sure you have the required dependencies installed:
-
-```bash
-npm install openai
-```
-
-### 4. Test the Configuration
-
-Run the test script to verify the Perplexity model is working correctly:
+Run the test-model script to verify your setup is working correctly:
 
 ```bash
 npm run test-model
 ```
 
-When running with debug mode enabled (`DEBUG=true`), you'll see confirmation that the Perplexity provider is being used:
+You should see output indicating that the Perplexity model is being used and a response to the test prompt.
 
+## Free Tier Limitations
+
+OpenRouter provides a free credit allowance for new accounts. To maximize your free usage:
+
+1. Use the `perplexity/sonar` model (not sonar-pro) for better credit efficiency
+2. Keep `MAX_TOKENS=500` in your configuration
+3. For complex expansions, consider breaking them into multiple smaller requests
+
+## Using Perplexity for Research
+
+Even if you prefer using DeepSeek as your default, you can use Perplexity for specific tasks that benefit from its research capabilities:
+
+```bash
+# Use the --research flag with any command
+npm run expand -- --id=3 --research
+npm run analyze-complexity -- --research
 ```
-DEBUG - USE_PERPLEXITY env var: "true"
-DEBUG - usePerplexity evaluated to: true
-DEBUG - Using LLM provider: perplexity
-DEBUG - Using model: perplexity/sonar-pro
-```
+
+This will temporarily switch to Perplexity for that specific command, then switch back to your default provider.
+
+## Troubleshooting
+
+If you encounter any issues:
+
+1. **Credit Check**: Verify you have credits remaining on your OpenRouter account
+2. **Token Validation**: Ensure your API key is correctly copied without extra spaces
+3. **Debug Mode**: Set `DEBUG=true` in your `.env` file for more detailed logs
+4. **Fallback**: If Perplexity fails, the system will automatically try to fall back to DeepSeek if configured
+
+## Advanced Configuration
+
+- `PERPLEXITY_MODEL`: Which model to use (`perplexity/sonar` is recommended for free tier)
+- `MAX_TOKENS`: Token generation limit (keep at 500 or less for free tier)
+- `TEMPERATURE`: Creativity setting (default: 0.7)
 
 ## Available Perplexity Models
 
