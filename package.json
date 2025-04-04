@@ -1,0 +1,29 @@
+{
+  "name": "coders-point",
+  "version": "1.0.0",
+  "description": "Task management system using DeepSeek AI",
+  "author": "CODE SEEKERS",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "list": "node scripts/dev.js list",
+    "generate": "node scripts/dev.js generate",
+    "parse-prd": "node scripts/dev.js parse-prd",
+    "test-model": "node --no-warnings scripts/modules/test-model.js"
+  },
+  "dependencies": {
+    "@azure-rest/ai-inference": "^1.0.0-beta.6",
+    "@azure/core-auth": "^1.9.0",
+    "@octokit/rest": "^20.1.2",
+    "axios": "^1.8.4",
+    "boxen": "^7.1.1",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.3",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "figlet": "^1.7.0",
+    "gradient-string": "^2.0.2",
+    "openai": "^4.28.0",
+    "ora": "^7.0.1"
+  }
+}
