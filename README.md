@@ -30,8 +30,8 @@ cd free-taskmaster
 npm install
 
 # Set up configuration
-cp .env.example .env
-# Edit .env with your API keys
+npm run setup
+# Or manually configure your .env file
 ```
 
 ## ⚙️ Configuration
@@ -116,6 +116,7 @@ npm run expand -- --id=3 --research
 - **Task Structure**: Tasks are saved in `tasks/tasks.json` and individual task files
 - **Custom PRDs**: Write your requirements in plain text (see `scripts/example_prd.txt`)
 - **Free Tier Limits**: Keep `MAX_TOKENS=500` in your `.env` to stay within free tier
+- **Complete Command Reference**: See [README-task-master.md](README-task-master.md) for the full command reference
 
 ## 👥 Contributing
 
@@ -124,6 +125,10 @@ Contributions are welcome! Feel free to submit issues or pull requests.
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgements
+
+This project is a free alternative version of the [claude-task-master](https://github.com/eyaltoledano/claude-task-master) project by Eyal Toledano. The original project uses Claude AI, whereas this version has been adapted to work with completely free AI models.
 
 ---
 
